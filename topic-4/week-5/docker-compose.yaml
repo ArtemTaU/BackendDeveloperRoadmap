@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  mongo1:
+    image: mongo:8
+    container_name: mongo1
+    command: ["mongod", "-f", "/etc/mongod.conf"]
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo1_data:/data/db
+      - ./conf/mongo1.conf:/etc/mongod.conf:ro
+    networks: [rsnet]
+
+  mongo2:
+    image: mongo:8
+    container_name: mongo2
+    command: ["mongod", "-f", "/etc/mongod.conf"]
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo2_data:/data/db
+      - ./conf/mongo2.conf:/etc/mongod.conf:ro
+    networks: [rsnet]
+
+  arbiter:
+    image: mongo:8
+    container_name: mongo-arb
+    command: ["mongod", "-f", "/etc/mongod.conf"]
+    # арбитр без persistent volume — он не хранит данные
+    volumes:
+      - ./conf/arbiter.conf:/etc/mongod.conf:ro
+    networks: [rsnet]
+
+volumes:
+  mongo1_data:
+  mongo2_data:
+
+networks:
+  rsnet:
+    driver: bridge
